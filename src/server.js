@@ -6,6 +6,7 @@ const methodOverride = require('method-override');
 const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport'); 
+const multer = require('multer');
 
 //Initializations
 const app = express();
@@ -35,6 +36,15 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+const storage = multer.diskStorage({
+    destination: path.join(__dirname, 'public/uploads'),
+    filename: (req, file, cb) => {
+        cb(null, new Date().getTime() + path.extname(file.originalname));
+    }
+});
+app.use(multer({storage}).single('image'));
 
 //Global varaables
 app.use((req, res, next) => {
@@ -50,6 +60,7 @@ app.use((req, res, next) => {
 app.use(require('./routes/index.routes'));
 app.use(require('./routes/note.routes'));
 app.use(require('./routes/users.routes'));
+app.use(require('./routes/img.routes'));
 
 //Static Files
 
